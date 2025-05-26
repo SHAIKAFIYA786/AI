@@ -1,0 +1,165 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document</title>
+  <link rel="stylesheet" href="http://cdn.jsdelivr.net/foundation/4.3.2/css/foundation.min.css"/>
+</head>
+<body>
+  <div class="row">
+    <div class="large-12 column">
+      <p>Hey, I am a header</p>
+      <p>Hi, good to see you</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-8 column">
+      <p>I am main content</p>
+    </div>
+    <div class="large-4 column">
+      <p>I am side content</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-12 column">
+      <footer>
+        All rights reserved
+      </footer>
+    </div>
+    
+  </div> <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="http://cdn.jsdelivr.net/foundation/4.3.2/js/foundation.min.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html> -->
+<Doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>table</title>
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
+<div className="code-editor flex flex-col w-full justify-between">
+                    {/* Tabs */}
+                    <div className="tabs flex w-full justify-between">
+                        <div className="flex gap-2 border-b border-gray-300 p-2 bg-gray-100 rounded-t-md w-full ">{openFiles.map((file, index) => (
+                            <div
+                                key={index}
+                                className={`px-3 py-1 rounded-t-md cursor-pointer text-sm font-medium ${currentFile === file
+                                    ? "bg-white border border-b-0 border-gray-300"
+                                    : "bg-gray-200"
+                                    }`}
+                                onClick={() => setCurrentFile(file)}
+                            >
+                                {file}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // prevent triggering file switch
+                                        setOpenFiles(openFiles.filter((f) => f !== file));
+                                        if (currentFile === file) {
+                                            setCurrentFile(openFiles.length > 1 ? openFiles.find(f => f !== file) : null);
+                                        }
+                                    }}
+                                    className="ml-2 text-red-500 hover:text-red-700 text-xs"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}</div>
+                        <div className="actions flex gap-2">
+                            <button
+                                onClick={async () => {
+                                    await webContainer.mount(fileTree);
+
+                                    // Step 1: Install dependencies
+                                    const installProcess = await webContainer.spawn("npm", ["install"]);
+
+                                    // Log install output
+                                    installProcess.output.pipeTo(new WritableStream({
+                                        write(chunk) {
+                                            console.log(chunk);
+                                        }
+                                    }));
+
+                                    // Wait for install to finish
+                                    await installProcess.exit;
+
+                                    // Step 2: Run the server
+                                    const serverProcess = await webContainer.spawn("npm", ["start"]); // or "node", ["index.js"]
+
+                                    serverProcess.output.pipeTo(new WritableStream({
+                                        write(chunk) {
+                                            console.log(chunk);
+                                        }
+                                    }));
+                                    if (runProcess) {
+                                        runProcess.kill()
+                                    }
+
+                                    let tempRunProcess = await webContainer.spawn("npm", ["start"]);
+
+                                    tempRunProcess.output.pipeTo(new WritableStream({
+                                        write(chunk) {
+                                            console.log(chunk)
+                                        }
+                                    }))
+
+                                    setRunProcess(tempRunProcess)
+
+                                    webContainer.on('server-ready', (port, url) => {
+                                        console.log(port, url)
+                                        setIframeUrl(url)
+                                    })
+                                }}
+                                className='p-2 px-4 bg-slate-300 text-white'>
+                                Run
+                            </button>
+
+                        </div>
+                    </div>
+                    {/* Code content area */}
+                    {/* {currentFile ? ( */}
+                    <div className="p-4 border border-t-0 border-gray-300 bg-white shadow-md rounded-b-md w-full">
+                        <h1 className="text-base font-semibold text-gray-800 mb-2">{currentFile}</h1>
+
+                        <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono w-full overflow-x-auto">
+                            <code
+                                ref={(el) => {
+                                    if (el) {
+                                        el.textContent = fileTree[currentFile]?.file?.contents || "No content";
+                                        hljs.highlightElement(el);
+                                    }
+                                }}
+                                className="language-javascript" // You can dynamically set based on file type if needed
+                            />
+                        </pre>
+                    </div>
+                    {/* ) : (
+                        <p className="text-gray-400 text-sm text-center mt-10">
+                            Select a file from the left to view its contents
+                        </p>
+                    )} */}
+
+                </div>

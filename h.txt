@@ -1,0 +1,33 @@
+<div className="code-editor flex gap-4 overflow-x-auto">
+  {openFiles.length === 0 ? (
+    <p className="text-gray-400 text-sm text-center mt-10">
+      Select a file from the left to view its contents
+    </p>
+  ) : (
+    openFiles.map((file, index) => (
+      <div
+        key={index}
+        className="min-w-[300px] border border-gray-300 rounded-md p-3 relative bg-white shadow"
+      >
+        {/* Header */}
+        <div className="code-editor-header flex items-center justify-between mb-2 border-b pb-1">
+          <h1 className="text-base font-semibold text-gray-800">{file}</h1>
+          <button
+            onClick={() =>
+              setOpenFiles(openFiles.filter((f) => f !== file))
+            }
+            className="text-red-500 hover:text-red-700 text-xl"
+          >
+            <i className="ri-close-fill"></i>
+          </button>
+        </div>
+
+        {/* Code content */}
+        <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+          {fileTree[file].file.contents
+ || "No content"}
+        </pre>
+      </div>
+    ))
+  )}
+</div>
